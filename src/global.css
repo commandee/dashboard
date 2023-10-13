@@ -1,0 +1,13 @@
+:root, body {
+    min-height: 100vh;
+    min-height: 100dvh;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+* {
+    box-sizing: border-box;
+}
