@@ -4,7 +4,6 @@
   import { onMount } from "svelte";
   import { checkLogin } from "./lib/login";
 
-  onMount(checkLogin);
 </script>
 
 <Router {routes}></Router>
