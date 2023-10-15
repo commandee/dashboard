@@ -15,15 +15,10 @@ export async function getRestaurant(id: string) {
 
 export async function getRestaurants() {
   const response = await api.get("/user/restaurants", { withCredentials: true });
-  console.log(response.data);
-
   return response.data as Restaurant[];
 }
 
 export function getLastRestaurant() {
   const restaurant = localStorage["restaurant"] as string | undefined;
-
-  console.log(restaurant);
-
   return restaurant;
 }
