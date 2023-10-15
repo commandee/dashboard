@@ -3,6 +3,7 @@ import api from "./api";
 import { writable, type Readable } from "svelte/store";
 import { getEmployee } from "./employee";
 import { getLastRestaurant, getRestaurant } from "./restaurant";
+import { push, replace } from "svelte-spa-router";
 
 interface LoginData {
   email: string;
@@ -26,14 +27,20 @@ export interface User {
 
 const loginData = writable<User | undefined>(undefined);
 
+let user: User | undefined;
+
 export const login = {
-  subscribe: loginData.subscribe
+  subscribe: loginData.subscribe,
+  get user() { return user }
 };
+
+login.subscribe((value) => {
+  user = value;
+});
 
 login.subscribe((value) => {
   if (!value || !value.restaurant) return;
 
-  console.log("storing", )
   localStorage.setItem("restaurant", value.restaurant.id);
 });
 
@@ -66,11 +73,15 @@ export async function signin({ email, password, restaurantId }: LoginData) {
 
     loginData.set(user);
   } catch (err) {
-    console.log(err);
-
     const error = err as any;
     throw new Error(error.response.data.message);
   }
+}
+
+export async function logout() {
+  await api.post("/user/logout", {}, { withCredentials: true });
+  loginData.set(undefined);
+  replace("#/login");
 }
 
 export async function restaurantLogin(restaurantId: string) {
@@ -99,22 +110,6 @@ export async function restaurantLogin(restaurantId: string) {
 
 async function whoAmI() {
   const response = await api.get("/user/whoami", { withCredentials: true });
-
-  const message = response.data.message;
-
-  switch (response.status) {
-    case 200:
-      break;
-    case 400:
-    case 401:
-      loginData.set(undefined);
-      throw new Error(message);
-    case 403:
-      loginData.set(undefined);
-      throw new Error("Your session has expired. Please login again.");
-    default:
-      loginData.set(undefined);
-  }
 
   return response.data as {
     id: string;

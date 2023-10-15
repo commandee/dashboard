@@ -1,9 +1,12 @@
-<script>
-  import Router from "svelte-spa-router";
+<script lang="ts">
+  import Router, { replace } from "svelte-spa-router";
   import routes from "./router";
-  import { onMount } from "svelte";
-  import { checkLogin } from "./lib/login";
 
+  function redirectFailed(event: any) {
+    if (event.detail.userData.login) {
+      replace("#/login");
+    }
+  }
 </script>
 
-<Router {routes}></Router>
+<Router {routes} on:conditionsFailed={redirectFailed}></Router>
