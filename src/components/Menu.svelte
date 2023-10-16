@@ -4,7 +4,6 @@
   import CardItem from "./CardItem.svelte";
 </script>
 
-<h2><strong>Restaurant: </strong>{$login?.restaurant?.name}</h2>
 <div class="cardapio">
   {#await getMenu()}
     <p>Carregando cardápio...</p>
@@ -22,5 +21,8 @@
     align-items: center;
     flex-wrap: wrap;
     gap: 1rem;
+
+    max-width: 50rem;
+    min-width: 15rem;
   }
 </style>

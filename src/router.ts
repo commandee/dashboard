@@ -12,16 +12,23 @@ function prepareRoute(route: any) {
 
   console.log(route);
 
+  const conditions: (() => boolean)[] = [];
+
   if (route.authorized) {
+    conditions.push(() => !!login.user);
+  }
+
+  if (route.condition) {
+    conditions.push(route.condition);
+  }
+
+  if (conditions.length > 0) {
     return wrap({
       component,
       userData: {
         login
       },
-      conditions: [
-        () => !!login.user,
-        route.condition
-      ]
+      conditions
     });
   }
 

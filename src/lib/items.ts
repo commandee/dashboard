@@ -4,6 +4,7 @@ export type Item = {
   id: string;
   name: string;
   price: number;
+  description?: string;
 }
 
 export async function getMenu() {
@@ -13,5 +14,17 @@ export async function getMenu() {
     id: string;
     name: string;
     price: number;
+    description?: string;
   }[];
+}
+
+export async function get(id: string) {
+  const response = await api.get(`/item/${id}`, { withCredentials: true });
+
+  return response.data as {
+    id: string;
+    name: string; 
+    price: number;
+    description?: string;
+  };
 }

@@ -1,4 +1,3 @@
-import '@picocss/pico/css/pico.min.css'
 import "./global.css"
 import App from './App.svelte'
 import { checkLogin } from './lib/login';

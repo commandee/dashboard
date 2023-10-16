@@ -1,14 +1,23 @@
-:root, body {
-    min-height: 100vh;
-    min-height: 100dvh;
-    background-color: #11191f;
+:root,
+body {
+  min-height: 100vh;
+  min-height: 100dvh;
+  background-color: #11191f;
+}
+
+:root {
+  font-family: sans-serif;
+
+  color: hsl(0, 0%, 70%);
 }
 
 body {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
 
 * {
-    box-sizing: border-box;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }

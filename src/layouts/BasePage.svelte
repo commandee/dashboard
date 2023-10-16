@@ -4,9 +4,7 @@
 
 <Nav />
 
-<div class="content">
-  <slot />
-</div>
+<slot />
 
 <footer>
   <ul>
@@ -16,9 +14,3 @@
   </ul>
 </footer>
 
-<style>
-  .content {
-    flex: 1 0 auto;
-    padding: 2rem 2rem;
-  }
-</style>
