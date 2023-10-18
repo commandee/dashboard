@@ -72,6 +72,7 @@ if (pages["/src/pages/404.svelte"]) {
 
 for (const path in pages) {
   const relativePath = path
+    .replaceAll("@", ":")
     .match(/\/src\/pages(.*?)(?:\/Index|\/index)?\.svelte/)![1]
     .toLowerCase();
   addRoute(relativePath, pages[path]);
