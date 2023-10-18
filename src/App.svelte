@@ -3,8 +3,14 @@
   import routes from "./router";
 
   function redirectFailed(event: any) {
-    if (event.detail.userData.login) {
+    if (event.detail.userData.reason === "auth") {
       replace("#/login");
+      return;
+    }
+
+    if (event.detail.userData.reason === "admin") {
+      replace("#/restaurant");
+      return;
     }
   }
 </script>

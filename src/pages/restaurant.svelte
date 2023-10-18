@@ -5,8 +5,10 @@
   import { getRestaurants } from "../lib/restaurant";
 
   let restaurantId: string;
+</script>
 
-  $: countPromise = employeeCount();
+<script context="module">
+  export const authorized = true;
 </script>
 
 <Page>
@@ -35,16 +37,18 @@
         <th>Endereço</th>
         <td>{$login?.restaurant?.address}</td>
       </tr>
-      <tr>
-        <th>Empregados</th>
-        <td>
-          {#await countPromise}
-            <p>Carregando...</p>
+      {#if $login?.restaurant?.role === "admin"}
+        <tr>
+          <th>Funcionários</th>
+          {#await employeeCount()}
+            <td>Carregando...</td>
           {:then count}
-            {count}
+            <td>{count}</td>
+          {:catch error}
+            <td>{error.message}</td>
           {/await}
-        </td>
-      </tr>
+        </tr>
+      {/if}
     </table>
   </main>
 </Page>

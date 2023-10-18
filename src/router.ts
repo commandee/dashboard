@@ -1,59 +1,85 @@
 import { wrap } from "svelte-spa-router/wrap";
 import { login } from "./lib/login";
+import { loc, type Location, type RouteDetail, type RoutePrecondition } from "svelte-spa-router";
 
 const pages = import.meta.glob("/src/pages/**/*.svelte", {
-  eager: true
+  eager: true,
 }) as Record<string, {} & { default: unknown }>;
 
-const routes: Record<string, unknown> = {};
+const routes: Record<string, RoutePrecondition[]> = {};
+const routePermissions: Record<string, Array<(href: string) => boolean | Promise<boolean>>> = {};
 
-function prepareRoute(route: any) {
+function addRoute(path: string, route: any) {
   const component = route.default;
 
-  console.log(route);
-
-  const conditions: (() => boolean)[] = [];
+  const conditions: RoutePrecondition[] = [];
 
   if (route.authorized) {
-    conditions.push(() => !!login.user);
-  }
-
-  if (route.condition) {
-    conditions.push(route.condition);
-  }
-
-  if (conditions.length > 0) {
-    return wrap({
-      component,
-      userData: {
-        login
-      },
-      conditions
+    conditions.push((detail) => {
+      detail.userData ??= {};
+      (detail.userData as Record<string, unknown>).reason = "auth";
+      return !!login.user;
     });
   }
 
-  return component;
+  if (route.admin) {
+    conditions.push((detail) => {
+      detail.userData ??= {};
+      (detail.userData as Record<string, unknown>).reason = "admin";
+
+      return login.user?.restaurant?.role === "admin";
+    });
+  }
+
+  const mountedRoute =
+    conditions.length > 0
+      ? wrap({
+          component,
+          userData: {},
+          conditions: conditions,
+        })
+      : component;
+
+  routePermissions[`#${path}`] = conditions.map(
+    (condition) => {
+      return (href: string) => {
+        const detail: RouteDetail = {
+          route: path,
+          location: href,
+          querystring: href.split("?")[1] ?? "",
+          userData: {},
+          params: null
+        }
+
+        return condition(detail);
+      };
+    }
+  );
+  routes[path] = mountedRoute;
 }
 
 if (pages["/src/pages/Index.svelte"]) {
-  routes["/"] = prepareRoute(pages["/src/pages/Index.svelte"]);
+  addRoute("/", pages["/src/pages/Index.svelte"]);
   delete pages["/src/pages/Index.svelte"];
 }
 
 let notFound: undefined | unknown;
 
 if (pages["/src/pages/404.svelte"]) {
-  notFound = prepareRoute(pages["/src/pages/404.svelte"]);
+  notFound = pages["/src/pages/404.svelte"];
   delete pages["/src/pages/404.svelte"];
 }
 
 for (const path in pages) {
-  const relativePath = path.match(/\/src\/pages(.*?)(?:\/Index)?\.svelte/)![1].toLowerCase();
-  routes[relativePath] = prepareRoute(pages[path]);
+  const relativePath = path
+    .match(/\/src\/pages(.*?)(?:\/Index|\/index)?\.svelte/)![1]
+    .toLowerCase();
+  addRoute(relativePath, pages[path]);
 }
 
 if (notFound) {
-  routes["*"] = notFound;
+  addRoute("*", notFound);
 }
 
 export default routes;
+export { routePermissions }

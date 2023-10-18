@@ -1,9 +1,6 @@
 <script context="module" lang="ts">
   export const authorized = true;
-
-  export function condition(detail: any) {
-    return login.user?.restaurant?.role === "admin";
-  }
+  export const admin = true;
 </script>
 
 <script lang="ts">
